@@ -5,7 +5,7 @@ This package provides a high-order solver for the isoeuler equations and a reade
 the network is easily plotted either in 2D or 3D manner.
 
 <p align="center">
-<img src="https://github.com/DCN-FAU-AvH/pyControls/blob/main/Icon.png" width="70%" height="70%" >
+<img src="https://github.com/DCN-FAU-AvH/pyControls/blob/main/Icon2.png" width="70%" height="70%" >
 </p>
 
 ## Quick installation
