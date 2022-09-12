@@ -4,6 +4,10 @@ The pyControls package provides a framework for simulations of gas networks with
 This package provides a high-order solver for the isoeuler equations and a reader for the GasLib scenarios. Furthermore,
 the network is easily plotted either in 2D or 3D manner.
 
+<p align="center">
+<img src="https://github.com/DCN-FAU-AvH/pyControls/blob/main/Icon.png" width="70%" height="70%" >
+</p>
+
 ## Quick installation
 
 In order to install pyControls, run
