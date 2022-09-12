@@ -1,0 +1,125 @@
+/*! @mainpage CLaw1dArena
+
+@section description Description of the library 
+
+<B>CLaw1dArena</B> is a C++  library for the numerical integration of 1d conservation and balance laws.
+
+It's main design goal is to allow experimenting with different combinations of reconstruction procedures, numerical fluxes, time integrators and so on.
+
+<B>CLaw1dArena</B> provide different libraries for each task (grid management, recontructions, numerical fluxes, time integration, sundry tools), each of which can be easily extended by adding your own favourite methods.
+
+The chosen balance between efficiency and usability is the following: a different executable is built for each conservation law (so that the compiler has some room for optimization) but all choices regarding the numerical method can be made at runtime.
+
+The distribution includes the file claw1d.cpp that the build system uses to generate an executable that computes solutions for each of the conservation laws that are implemented. Each of these codes share a common set of command-line parameters to select e.g. the initial data, grid size, timestepping, reconstruction, numerical flux to be employed and so on. (Please see \ref exe_options for the list of them)
+
+@section use Use of the library
+
+<ul>
+  <li>The provided claw1d.cpp source file generates executables for a given conservation law in which all the scheme details are selected from the command line.</li>
+  <li>You may of course create your own program, linking to the modules of this project and instantiating a timestepper, a reconstruction and a numerical flux among those already available.</li>
+</ul>
+
+@subsection citing Licence and citation
+This library is free software and is distributed ``as is'', without warranty of any kind. You are encouraged to study the source code, run the software, modify it for your own purposes or even redistribute it under the terms of the GPLv3 licence.
+
+If you find this software useful, please cite it as
+<br>
+<tt>claw1dArena</tt>
+by M. Semplice and G. Visconti.
+DOI: http://doi.org/10.5281/zenodo.2641725
+
+@section exe_generated Executables generated
+
+A conservation law is a class derived from CLawBase. Currently linear transport, Burgers, Saint-Venant and Euler-gas dynamics are implemented.
+
+New systems of conservation laws can be easily added by defining a new class derived from CLawBase.
+
+When building, after generating the libraries for each module in the project, the following executables are built from claw1d.cpp
+
+<ul>
+  <li> @subpage lintra for linear transport equation</li>
+  <li> @subpage burgers for Burgers equation</li>
+  <li> @subpage gasdynamics for Euler-equations</li>
+  <li> @subpage swe for Saint-Venant equations</li>
+</ul>
+
+@section exe_options Command-line options for the executables
+
+If no options are given, the default problem is solved with a first order scheme and 25 cells.
+
+The options accepted by all executables are
+
+<ul>
+  <li> -&thinsp;-<tt>pb</tt> <tt>PBNAME</tt> : see the specific pages in \ref exe_generated for the available <tt>PBNAME</tt> values for each conservation law </li>
+  <li> -&thinsp;-<tt>rec</tt> <tt>RECNAME</tt> instantiates the reconstruction where <tt>RECNAME</tt> is one of
+    <ul>
+      <li> <tt>constant</tt> for piecewise constant reconstruction </li>
+      <li> <tt>linear</tt> for min-mod </li>
+      <li> <tt>cweno*</tt> followed by an odd number \f$\geq 3\f$ specifying the order of the method for Central %WENO reconstructions </li>
+      <li> <tt>cwenoz*</tt> followed by an odd number \f$\geq 3\f$ specifying the order of the method for Central WENOZ reconstructions </li>
+    </ul>
+  It is possible to define your own reconstruction by deriving a class from RecBase </li>
+  <li> -&thinsp;-<tt>stepper</tt> <tt>STEPPERNAME</tt> instantiates the time integration scheme where <tt>STEPPERNAME</tt> is one of
+    <ul>
+      <li> <tt>euler</tt> for %Euler's method </li>
+      <li> <tt>erk*</tt> followed by the order of the scheme for explicit Runge-Kutta methods </li>
+    </ul>
+  The list of all time integrators is given in src/timeintegration/butcher.cpp and new ones may be added there</li>
+  <li> -&thinsp;-<tt>flux</tt> <tt>FLUXNAME</tt> instantiates the numerical flux where <tt>FLUXNAME</tt> is one of
+    <ul>
+      <li> <tt>llf</tt> for Local Lax-Friedrichs (Rusanov) </li>
+      <li> <tt>hllc</tt> for HLLC (Einfeldt's speed estimates) </li>
+    </ul>
+    It is possible to define your own reconstruction by deriving a class from FluxBase
+    </li>
+  <li> -&thinsp;-<tt>N</tt> selects the number of cells </li>
+  <li> -&thinsp;-<tt>tfin</tt> overrides the final time defined in the problem </li>
+  <li> -&thinsp;-<tt>cfl</tt> selects the cfl number </li>
+</ul>
+
+For the options specific to each conservation law, see 
+@subpage lintra
+,
+@subpage burgers
+,
+@subpage gasdynamics
+and
+@subpage swe
+
+For the complete list of options, see claw1d.cpp and parseOptions.cpp files.
+
+@section examples Examples
+
+<ul>
+<li>To compute the solution of the shock-acoustic interaction problem with 800 cells, CWENOZ3 and third order explicit Runge-Kutta timestepping, call
+@code
+./gasdynamics --pb shockacoustic --rec cwenoz3 --stepper erk3 --N 800
+@endcode
+</li>
+<li> To compute the solution of the shock-acoustic interaction problem with 400 cells, fifth order explicit Runge-Kutta timestepping, CWENO5 applied to characteristic variables, call
+@code
+./gasdynamics --charProj --pb shockacoustic --rec cweno5 --stepper erk5 --N 400
+@endcode
+</li>
+<li>To compute the solution of the Saint-Venant equations with ``lake at rest'' initial conditions, 200 cells, third order explicit Runge-Kutta timestepping, CWENOZ3 and hydrostatic well-balancing, call
+@code
+./swe --WBhydro --pb lakeatrest --rec cwenoz3 --stepper erk3 --N 200
+@endcode
+</li>
+</ul>
+
+@section references References
+
+This library was used for the numerical simulations in the following papers
+<ol>
+  <li> I. Cravero, G. Puppo, M. Semplice, and G. Visconti, <i>Cool %WENO schemes</i>, Comput. Fluids, 169 (2018), pp. 71–86,  https://doi.org/10.1016/j.compfluid.2017.07.022
+  </li>
+  <li> I. Cravero, G. Puppo, M. Semplice, and G. Visconti, <i>CWENO: uniformly accurate reconstructions for balance laws</i>, Math. Comput., 87 (2018), pp. 1689–1719,
+  http://doi.org/10.1090/mcom/3273
+  </li>
+  <li> I. Cravero, M. Semplice, and G. Visconti, <i>Optimal definition of the nonlinear weights in multidimensional Central WENOZ reconstructions</i>, Submitted, (2019),
+  https://arxiv.org/abs/1811.08688
+  </li>
+</ol> 
+
+*/
